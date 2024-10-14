@@ -11,6 +11,9 @@ function TimerCreation() {
     try {
       const response = await fetch('https://drs-timer-backend.onrender.com/createTimer', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
       });
 
      
