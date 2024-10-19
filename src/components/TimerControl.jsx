@@ -1,48 +1,49 @@
-
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import io from 'socket.io-client';
+import useSocket from '../hooks/useSocket';
 import './Timer.css';
 
-const socket = io('https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net');
+const URL = 'https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net';
 
 function TimerControl() {
-  const { uniqueId } = useParams(); 
+  const { uniqueId } = useParams();
   const [time, setTime] = useState(15);
-  const [isRunning, setIsRunning] = useState(false); 
+  const [isRunning, setIsRunning] = useState(false);
+  const socket = useSocket(URL, uniqueId);
 
   useEffect(() => {
-    socket.emit('joinRoom', uniqueId);
-    socket.emit('resetTimer', uniqueId); 
+    if (socket) {
+      socket.emit('resetTimer', uniqueId);
 
-    socket.on('timerUpdate', (newTime) => {
-      setTime(newTime);
-      if (newTime === 15) {
-        setIsRunning(false); 
-      }
-    });
+      socket.on('timerUpdate', (newTime) => {
+        setTime(newTime);
+        setIsRunning(newTime !== 15);
+      });
 
-    return () => {
-      socket.off('timerUpdate');
-    };
-  }, [uniqueId]);
+      return () => {
+        socket.off('timerUpdate');
+      };
+    }
+  }, [socket, uniqueId]);
 
-  const handleStartTimer = () => {
+  const handleStartTimer = useCallback(() => {
     setIsRunning(true);
     socket.emit('startTimer', uniqueId);
-  };
+  }, [socket, uniqueId]);
 
-  const handleResetTimer = () => {
+  const handleResetTimer = useCallback(() => {
     setTime(15);
     setIsRunning(false);
-    socket.emit('resetTimer', uniqueId); 
-  };
+    socket.emit('resetTimer', uniqueId);
+  }, [socket, uniqueId]);
+
+  const startDisabled = useMemo(() => isRunning || time !== 15, [isRunning, time]);
+  const resetDisabled = useMemo(() => !isRunning || time === 15, [isRunning, time]);
 
   return (
     <div className="control-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div className="timer-container">
-        <div className='text'>
+        <div className="text">
           <p>Review Timer</p>
         </div>
         <div className="timer-overlay">
@@ -51,10 +52,10 @@ function TimerControl() {
       </div>
 
       <div className="button-container">
-        <button onClick={handleStartTimer} disabled={isRunning || time !== 15}>
+        <button onClick={handleStartTimer} disabled={startDisabled}>
           Start Timer
         </button>
-        <button onClick={handleResetTimer} disabled={!isRunning || time === 15} style={{ marginLeft: '10px' }}>
+        <button onClick={handleResetTimer} disabled={resetDisabled} style={{ marginLeft: '10px' }}>
           Reset Timer
         </button>
       </div>

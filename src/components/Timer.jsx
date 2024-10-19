@@ -1,27 +1,28 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import io from 'socket.io-client';
+import useSocket from '../hooks/useSocket';
 import './Timer.css'; 
 
-const socket = io('https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net');
+const URL = 'https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net';
 
 function Timer() {
-  const { uniqueId } = useParams(); 
+  const { uniqueId } = useParams();
   const [timer, setTimer] = useState(15);
+  const socket = useSocket(URL, uniqueId);
 
   useEffect(() => {
-    socket.emit('joinRoom', uniqueId);
-    socket.emit('resetTimer', uniqueId); 
+    if (socket) {
+      socket.emit('resetTimer', uniqueId); 
 
-    socket.on('timerUpdate', (newTime) => {
-      setTimer(newTime);
-    });
+      socket.on('timerUpdate', (newTime) => {
+        setTimer(newTime);
+      });
 
-    return () => {
-      socket.off('timerUpdate');
-    };
-  }, [uniqueId]);
+      return () => {
+        socket.off('timerUpdate');
+      };
+    }
+  }, [socket, uniqueId]);
 
   return (
     <div className="container">

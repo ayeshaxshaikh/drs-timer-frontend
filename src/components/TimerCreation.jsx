@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Timer.css'
+import './Timer.css';
 
 function TimerCreation() {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const createTimer = async () => {
     setLoading(true);
@@ -16,7 +14,6 @@ function TimerCreation() {
         },
       });
 
-     
       if (!response.ok) {
         throw new Error('Failed to create timer');
       }
