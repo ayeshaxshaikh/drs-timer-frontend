@@ -9,7 +9,7 @@ function TimerCreation() {
   const createTimer = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://drs-timer-backend.onrender.com/createTimer', {
+      const response = await fetch('https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net/createTimer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

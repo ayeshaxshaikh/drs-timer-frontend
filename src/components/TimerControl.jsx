@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import './Timer.css';
 
-const socket = io('https://drs-timer-backend.onrender.com');
+const socket = io('https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net');
 
 function TimerControl() {
   const { uniqueId } = useParams(); 
