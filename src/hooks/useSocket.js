@@ -11,7 +11,7 @@ const useSocket = (url, uniqueId) => {
     socketInstance.emit('joinRoom', uniqueId);
 
     return () => {
-      socketInstance.disconnect(); // Clean up the connection when the component unmounts
+      socketInstance.disconnect();
     };
   }, [url, uniqueId]);
 

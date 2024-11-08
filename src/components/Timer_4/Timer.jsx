@@ -1,25 +1,25 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import useSocket from '../hooks/useSocket';
-import './Timer.css'; 
+import useSocket from '../../hooks/useSocket';
+import '../Timer.css'; 
 
 const URL = 'https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewebsites.net';
 
 function Timer() {
   const { uniqueId } = useParams();
-  const [timer, setTimer] = useState(15);
+  const [timer, setTimer] = useState(4);
   const socket = useSocket(URL, uniqueId);
 
   useEffect(() => {
     if (socket) {
-      socket.emit('resetTimer', uniqueId); 
+      socket.emit('resetTimer4', uniqueId); 
 
-      socket.on('timerUpdate', (newTime) => {
+      socket.on('timerUpdate4', (newTime) => {
         setTimer(newTime);
       });
 
       return () => {
-        socket.off('timerUpdate');
+        socket.off('timerUpdate4');
       };
     }
   }, [socket, uniqueId]);
