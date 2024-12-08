@@ -10,6 +10,7 @@ function TimerControl() {
   const [time, setTime] = useState(15);
   const [isRunning, setIsRunning] = useState(false);
   const socket = useSocket(URL, uniqueId);
+  const [isHide, setIsHide] = useState(false)
 
   useEffect(() => {
     if (socket) {
@@ -27,6 +28,7 @@ function TimerControl() {
   }, [socket, uniqueId]);
 
   const handleStartTimer = useCallback(() => {
+    setIsHide(false)
     setIsRunning(true);
     socket.emit('startTimer15', uniqueId);
   }, [socket, uniqueId]);
@@ -37,12 +39,20 @@ function TimerControl() {
     socket.emit('resetTimer15', uniqueId);
   }, [socket, uniqueId]);
 
+  const handleHideTimer = () => {
+    setIsHide(true);
+    socket.emit('hideTimer', uniqueId);  // Notify Timer page
+  };
+  
+
   const startDisabled = useMemo(() => isRunning || time !== 15, [isRunning, time]);
   const resetDisabled = useMemo(() => !isRunning || time === 15, [isRunning, time]);
 
   return (
     <div className="control-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <div className="timer-container">
+      {
+        !isHide && (
+          <div className="timer-container">
         <div className="text">
           <p>Review Timer</p>
         </div>
@@ -50,6 +60,8 @@ function TimerControl() {
           <p>{time}</p>
         </div>
       </div>
+        )
+      }
 
       <div className="button-container">
         <button onClick={handleStartTimer} disabled={startDisabled}>
@@ -58,6 +70,7 @@ function TimerControl() {
         <button onClick={handleResetTimer} disabled={resetDisabled} style={{ marginLeft: '10px' }}>
           Reset Timer
         </button>
+        <button onClick={handleHideTimer} style={{ marginLeft: '10px' }}>Hide Timer</button>
       </div>
     </div>
   );

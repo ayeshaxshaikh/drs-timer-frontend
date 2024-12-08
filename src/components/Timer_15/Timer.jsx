@@ -8,6 +8,7 @@ const URL = 'https://drs-timer-backend-fhheakashabcdyb8.canadacentral-01.azurewe
 function Timer() {
   const { uniqueId } = useParams();
   const [timer, setTimer] = useState(15);
+  const [isHidden, setIsHidden] = useState(false);
   const socket = useSocket(URL, uniqueId);
 
   useEffect(() => {
@@ -18,11 +19,19 @@ function Timer() {
         setTimer(newTime);
       });
 
+      socket.on("hideTimer", () => setIsHidden(true));
+      socket.on("showTimer", () => setIsHidden(false));
+
+
       return () => {
-        socket.off('timerUpdate15');
+        socket.off("timerUpdate15");
+        socket.off("hideTimer");
+        socket.off("showTimer");
       };
     }
   }, [socket, uniqueId]);
+
+  if (isHidden) return null;
 
   return (
     <div className="container">
